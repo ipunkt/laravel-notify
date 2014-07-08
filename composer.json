@@ -1,0 +1,26 @@
+{
+    "name": "ipunkt/laravel-notify",
+    "description": "Provides an ready to use object oriented notification interface for laravel 4, including working example javascript and css for Twitter Bootstrap 3",
+    "keywords": ["laravel","laravel4","notification","javascript","jquery","bootstrap"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bastian Rang (ipunkt Business Solutions)",
+            "email": "br@ipunkt.biz"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "laravel/framework": "4.x",
+        "illuminate/support": "4.x"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
+        "psr-0": {
+            "Ipunkt\\LaravelNotify\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,18 @@
+@charset "UTF-8";
+#notify .count {
+    display: inline-block;
+    min-width: 1em;
+    padding: 3px 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    vertical-align: top;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #d9534f;
+    border-radius: 1em;
+    position: absolute;
+    right: .25em;
+    top: .25em;
+}
