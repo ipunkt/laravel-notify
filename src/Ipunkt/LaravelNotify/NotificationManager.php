@@ -11,21 +11,23 @@ namespace Ipunkt\LaravelNotify;
 
 use Auth;
 use Closure;
+use Collection;
 use Config;
+use Redirect;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Support\SerializableClosure;
-use Ipunkt\Notification\Contracts\NotificationTypeInterface;
-use Notification;
-use NotificationActivity;
+use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
+use Ipunkt\LaravelNotify\Models\Notification;
+use Ipunkt\LaravelNotify\Models\NotificationActivity;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class NotificationManager
- * @package Ipunkt\Notification
+ * @package Ipunkt\LaravelNotify
  */
 class NotificationManager
 {
-    /** @var null Collection */
+    /** @var Collection notifications */
     protected $notifications = null;
 
     /**
@@ -110,7 +112,7 @@ class NotificationManager
             }
             return $class->$action();
         }
-        return \Redirect::back();
+        return Redirect::back();
     }
 
 
@@ -191,7 +193,7 @@ class NotificationManager
     {
         $data['closure'] = serialize(new SerializableClosure($job));
 
-        return array('job' => 'Ipunkt\Notification\Types\ClosureNotification', 'data' => $data);
+        return array('job' => 'Ipunkt\LaravelNotify\Types\ClosureNotification', 'data' => $data);
     }
 
 
@@ -215,7 +217,7 @@ class NotificationManager
             return $job;
         } else {
             $data['message'] = $job;
-            return $this->createNotification('Ipunkt\Notification\Types\MessageNotification', $data);
+            return $this->createNotification('Ipunkt\LaravelNotify\Types\MessageNotification', $data);
         }
     }
 }

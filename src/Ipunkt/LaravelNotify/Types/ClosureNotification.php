@@ -10,7 +10,7 @@ namespace Ipunkt\LaravelNotify\Types;
 
 
 use Illuminate\Support\SerializableClosure;
-use Notification;
+use Ipunkt\LaravelNotify\Models\Notification;
 
 class ClosureNotification extends AbstractNotification
 {
@@ -20,7 +20,7 @@ class ClosureNotification extends AbstractNotification
     /**
      * Fire the Closure based queue job.
      *
-     * @param \Notification $notification
+     * @param Notification $notification
      */
     public function __construct(Notification $notification)
     {

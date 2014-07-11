@@ -1,5 +1,6 @@
 <?php namespace Ipunkt\LaravelNotify;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelNotifyServiceProvider extends ServiceProvider {
@@ -29,9 +30,11 @@ class LaravelNotifyServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->registerNotificationManager();
+
+		$this->registerNotifyFacade();
 	}
 
-    /**
+	/**
      * Register the Notify-Facade
      */
     protected function registerNotificationManager()
@@ -41,7 +44,19 @@ class LaravelNotifyServiceProvider extends ServiceProvider {
         });
     }
 
-    /**
+	/**
+	 * Register the Notify:: facade
+	 */
+	private function registerNotifyFacade()
+	{
+		$this->app->booting(function()
+		{
+			$loader = AliasLoader::getInstance();
+			$loader->alias('Notify', 'Ipunkt\LaravelNotify\NotificationFacade');
+		});
+	}
+
+	/**
      * Get the services provided by the provider.
      *
      * @return array
@@ -50,5 +65,4 @@ class LaravelNotifyServiceProvider extends ServiceProvider {
     {
         return ['notify'];
     }
-
 }

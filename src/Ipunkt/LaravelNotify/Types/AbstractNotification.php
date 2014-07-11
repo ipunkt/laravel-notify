@@ -12,13 +12,18 @@ namespace Ipunkt\LaravelNotify\Types;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
 use Ipunkt\LaravelNotify\Models\Notification;
 use Ipunkt\LaravelNotify\Models\NotificationActivity;
+use Lang;
+use URL;
+use Notify;
+use Redirect;
+use Response;
 
 abstract class AbstractNotification implements NotificationTypeInterface
 {
     /** @var array */
     protected $data = [];
 
-    /** @var \Notification */
+    /** @var Notification */
     protected $model = null;
 
     /**
@@ -58,7 +63,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
     public function show()
     {
         if (isset($this->data['message'])) {
-            return \Lang::get($this->data['message'], $this->data);
+            return Lang::get($this->data['message'], $this->data);
         }
     }
 
@@ -79,7 +84,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
         return [
             'id' => $this->model->id,
             'show' => $this->show(),
-            'link' => \URL::route('notify.action', array('notification' => $this->model->id, 'action' => 'read')),
+            'link' => URL::route('notify.action', array('notification' => $this->model->id, 'action' => 'read')),
             'data' => $this->data,
             'state' => $latestActivity->activity,
             'updated_at' => $latestActivity->created_at,
@@ -99,20 +104,20 @@ abstract class AbstractNotification implements NotificationTypeInterface
     /**
      * Do the read-Action
      * By default, forwards to Done-Action
-     * @return \Response
+     * @return Response
      */
     public function read()
     {
-        return \Notify::doAction($this->model, NotificationActivity::DONE);
+        return Notify::doAction($this->model, NotificationActivity::DONE);
     }
 
     /**
      * Do the done-Action
-     * @return \Response
+     * @return Response
      */
     public function done()
     {
-        return \Redirect::back();
+        return Redirect::back();
     }
 
 

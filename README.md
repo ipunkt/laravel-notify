@@ -30,6 +30,7 @@ Add to your composer.json following lines
 	}
 
 Add `'Ipunkt\LaravelNotify\LaravelNotifyServiceProvider',` to `providers` in `app/config/app.php`.
+The Service provider also registers an alias `Notify` to your application.
 
 On command line publish the database migrations:
 

@@ -5,6 +5,12 @@ use Illuminate\Auth\UserInterface;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
 use Ipunkt\LaravelNotify\Models\Notification;
 use Ipunkt\LaravelNotify\Models\NotificationActivity;
+use Auth;
+use Notify;
+use Request;
+use View;
+use Config;
+use Response;
 
 class NotifyController extends \Controller
 {
@@ -18,7 +24,7 @@ class NotifyController extends \Controller
      */
     public function __construct(UserInterface $user = null)
     {
-        $this->user = $user ? : \Auth::user();
+        $this->user = $user ? : Auth::user();
     }
 
     /**
@@ -30,23 +36,25 @@ class NotifyController extends \Controller
     public function index()
     {
         /** @var NotificationTypeInterface $notifications */
-        $notifications = \Notify::getForUser($this->user, [NotificationActivity::CREATED, NotificationActivity::READ]);
-        if (\Request::ajax()) {
+        $notifications = Notify::getForUser($this->user, [NotificationActivity::CREATED, NotificationActivity::READ]);
+        if (Request::ajax()) {
             return $notifications;
         }
 
-        return \View::make(\Config::get('notification.views.index'), compact('notifications'));
+        return View::make(Config::get('notification.views.index'), compact('notifications'));
     }
 
-    /**
-     * Display the specified resource.
-     * GET /notify/{id}
-     *
-     * @param  int $id
-     * @return \Response
-     */
+	/**
+	 * Display the specified resource.
+	 * GET /notify/{id}
+	 *
+	 * @param \Ipunkt\LaravelNotify\Models\Notification $notification
+	 * @param $action
+	 * @internal param int $id
+	 * @return Response
+	 */
     public function action(Notification $notification, $action)
     {
-        return \Notify::doAction($notification, $action, $this->user);
+        return Notify::doAction($notification, $action, $this->user);
     }
 }
