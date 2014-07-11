@@ -16,7 +16,7 @@ return [
         'action' => 'notify/{notification}/{action}'
     ],
     'views' => [
-        'index' => 'users.notifications',
+        'index' => 'notifications',
     ],
 
     /**
