@@ -41,7 +41,7 @@ class NotifyController extends \Controller
             return $notifications;
         }
 
-        return View::make(Config::get('notification.views.index'), compact('notifications'));
+        return View::make(Config::get('laravel-notify::notify.views.index'), compact('notifications'));
     }
 
 	/**
