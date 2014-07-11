@@ -26,8 +26,11 @@ Add to your composer.json following lines
 	]
 
 	"require": {
-		"ipunkt/laravel-notify": "1.*"
+		"ipunkt/laravel-notify": "*"
 	}
 
 Add `'Ipunkt\LaravelNotify\LaravelNotifyServiceProvider',` to `providers` in `app/config/app.php`.
 
+On command line publish the database migrations:
+
+	$> php artisan migrate:publish ipunkt/laravel-notify
