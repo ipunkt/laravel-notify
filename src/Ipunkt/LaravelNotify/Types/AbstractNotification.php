@@ -123,7 +123,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
 
 	/**
 	 * Do the delete-Action
-	 * @return \Response
+	 * @return Response
 	 */
 	public function delete()
 	{
