@@ -31,7 +31,7 @@ class NotifyController extends \Controller
      * Display a listing of the resource.
      * GET /notify
      *
-     * @return \Response
+     * @return Response
      */
     public function index()
     {
