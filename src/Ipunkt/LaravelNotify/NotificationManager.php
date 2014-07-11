@@ -107,7 +107,7 @@ class NotificationManager
     {
         $class = $this->instantiateNotification($notification, $user);
         if (method_exists($class, $action)) {
-            if (Config::get('notification.auto_add_activities_for_actions')) {
+            if (Config::get('laravel-notify::notify.auto_add_activities_for_actions')) {
                 $this->addActivity($notification, $action);
             }
             return $class->$action();
@@ -209,15 +209,21 @@ class NotificationManager
         if ($job instanceof Closure) {
             $payload = $this->createClosurePayload($job, $data);
             return Notification::create($payload);
-        } elseif ($job instanceof NotificationTypeInterface) {
-            return Notification::create(['job' => 'serialize', 'data' => [serialize($job)]]);
-        } elseif (class_exists($job)) {
-            return Notification::create(['job' => $job, 'data' => $data]);
-        } elseif ($job instanceof Notification) {
-            return $job;
-        } else {
-            $data['message'] = $job;
-            return $this->createNotification('Ipunkt\LaravelNotify\Types\MessageNotification', $data);
         }
+
+        if ($job instanceof NotificationTypeInterface) {
+            return Notification::create(['job' => 'serialize', 'data' => [serialize($job)]]);
+        }
+
+        if (class_exists($job)) {
+            return Notification::create(['job' => $job, 'data' => $data]);
+        }
+
+	    if ($job instanceof Notification) {
+            return $job;
+        }
+
+        $data['message'] = $job;
+        return $this->createNotification('Ipunkt\LaravelNotify\Types\MessageNotification', $data);
     }
 }

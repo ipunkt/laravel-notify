@@ -80,7 +80,7 @@ class LaravelNotifyServiceProvider extends ServiceProvider {
 
 		//  setting the route to do an action
 		$router->get($config->get('laravel-notify::notify.routes.action'), [
-			'as' => 'notify.index',
+			'as' => 'notify.action',
 			'uses' => 'Ipunkt\LaravelNotify\Controllers\NotifyController@action'
 		]);
 	}

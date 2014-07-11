@@ -16,7 +16,7 @@ return [
         'action' => 'notify/{notification}/{action}'
     ],
     'views' => [
-        'index' => 'notifications',
+        'index' => 'laravel-notify::notifications',
     ],
 
     /**
