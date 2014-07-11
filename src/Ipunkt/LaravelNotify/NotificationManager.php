@@ -60,7 +60,7 @@ class NotificationManager
 
     /**
      * Get all Notifications for the current authenticated user
-     * @return array of NotificationTypeInterface
+     * @return NotificationTypeInterface[]
      */
     public function get()
     {
@@ -71,7 +71,7 @@ class NotificationManager
      * get all Notifications for the given user
      * @param UserInterface $user
      * @param array $activities
-     * @return array of NotificationTypeInterface
+     * @return NotificationTypeInterface[]
      */
     public function getForUser(UserInterface $user = null, $activities = [])
     {
@@ -83,7 +83,7 @@ class NotificationManager
             return [];
         }
 
-        /** @var Notification $notificationModels */
+        /** @var Notification[] $notificationModels */
         $notificationModels = Notification::forUser($user, $activities)->get();
 
         /**

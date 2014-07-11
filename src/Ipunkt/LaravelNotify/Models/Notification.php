@@ -35,7 +35,7 @@ class Notification extends Eloquent
      */
     public function activities()
     {
-        return $this->hasMany('NotificationActivity');
+        return $this->hasMany('Ipunkt\LaravelNotify\Models\NotificationActivity');
     }
 
     /**
@@ -71,7 +71,7 @@ class Notification extends Eloquent
      * @param Builder $query
      * @param UserInterface $user
      * @param array $activities
-     * @return Builder|static
+     * @return Builder
      */
     public function scopeForUser(Builder $query, UserInterface $user = null, array $activities = [])
     {
@@ -175,4 +175,4 @@ class Notification extends Eloquent
     }
 
 
-} 
+}

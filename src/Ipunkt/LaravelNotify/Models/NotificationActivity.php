@@ -33,7 +33,7 @@ class NotificationActivity extends Eloquent
      */
     public function notification()
     {
-        return $this->belongsTo('Notification');
+        return $this->belongsTo('Ipunkt\LaravelNotify\Models\Notification');
     }
 
-} 
+}

@@ -35,7 +35,7 @@ class NotifyController extends \Controller
      */
     public function index()
     {
-        /** @var NotificationTypeInterface $notifications */
+        /** @var NotificationTypeInterface[] $notifications */
         $notifications = Notify::getForUser($this->user, [NotificationActivity::CREATED, NotificationActivity::READ]);
         if (Request::ajax()) {
             return $notifications;
