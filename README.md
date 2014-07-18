@@ -49,3 +49,18 @@ Add somewhere in your bootstrap the shipped view composer to auto-handle the giv
 
 The view composer injects a variable `$notifications` into the view. It is a collection of all notifications that
 	were created or read.
+
+Now you can use this template to display all notifications or you can use it with Bootstrap 3 in your navbar like
+	this.
+
+	$> php artisan asset:publish ipunkt/laravel-notify
+
+And then include the following files in your layout: `/packages/ipunkt/laravel-notify/css/notify.css` and
+	`/packages/ipunkt/laravel-notify/js/notify.js`. The latter needs jquery to be existent.
+
+Then go to your layout and create an `<li id="notify"><a href="{{{ URL::route('notify.index') }}}"><i class="glyphicon glyphicon-warning-sign"></i></li>`
+	in your navbar navigation list.
+
+Whenever there are notifications to be listed the ViewComposer initially fills the `$notifications` variable in the
+	shipped `notification` view and the javascript makes an ajax call to get these and displays as menu. Without
+	javascript the link opens a page where all notifications will be listed.
