@@ -17,7 +17,7 @@ class ViewComposer
 	/**
 	 * authentication manager
 	 *
-	 * @var \Illuminate\Auth\Manager
+	 * @var \Illuminate\Auth\AuthManager
 	 */
 	private $authManager;
 
@@ -31,10 +31,10 @@ class ViewComposer
 	/**
 	 * inject the auth manager and notification manager
 	 *
-	 * @param \Illuminate\Auth\Manager $authManager
+	 * @param \Illuminate\Auth\AuthManager $authManager
 	 * @param NotificationManager $notificationManager
 	 */
-	public function __construct(\Illuminate\Auth\Manager $authManager, NotificationManager $notificationManager)
+	public function __construct(\Illuminate\Auth\AuthManager $authManager, NotificationManager $notificationManager)
 	{
 		$this->authManager = $authManager;
 		$this->notificationManager = $notificationManager;
@@ -49,8 +49,8 @@ class ViewComposer
 	{
 		$notifications = [];
 
-		if (null !== ($user = $this->auth->user())) {
-			$notifications = $this->notificationManager->getForUser($this->auth->user(), [
+		if (null !== ($user = $this->authManager->user())) {
+			$notifications = $this->notificationManager->getForUser($user, [
 				NotificationActivity::CREATED,
 				NotificationActivity::READ
 			]);
