@@ -84,7 +84,7 @@ class NotificationManager
         }
 
         /** @var Notification[] $notificationModels */
-        $notificationModels = Notification::forUser($user, $activities)->get();
+        $notificationModels = Notification::forUser($user, $activities)->reverse()->get();
 
         /**
          * Create NotificationTypes

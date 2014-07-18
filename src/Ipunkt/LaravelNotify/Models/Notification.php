@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property array $data
  * @property string $job
  * @method static Builder forUser() forUser(UserInterface $user) forUser(UserInterface $user, array $activities)
+ * @method static Builder reverse()
  */
 class Notification extends Eloquent
 {
@@ -90,6 +91,14 @@ class Notification extends Eloquent
             }
         });
     }
+
+	/**
+	 * @param Builder $query
+	 */
+	public function scopeReverse(Builder $query)
+	{
+		$query->orderBy('id', 'DESC');
+	}
 
     /**
      * @param UserInterface $user
