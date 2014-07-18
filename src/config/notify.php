@@ -16,6 +16,12 @@ return [
          */
         'index' => 'notify/index',
 
+		/**
+		 * Route to list all notifications
+		 * creates a route named "notify.all"
+		 */
+		'all' => 'notify/all',
+
         /**
          * Route to an action
          * creates a route named "notify.action"

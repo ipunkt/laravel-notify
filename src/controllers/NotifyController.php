@@ -29,7 +29,7 @@ class NotifyController extends \Controller
 
     /**
      * Display a listing of the resource.
-     * GET /notify
+     * GET /notify/index
      *
      * @return Response
      */
@@ -45,8 +45,25 @@ class NotifyController extends \Controller
     }
 
 	/**
+	 * Display a listing of all resources.
+	 * GET /notify/all
+	 *
+	 * @return \Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface[]
+	 */
+	public function all()
+	{
+		/** @var NotificationTypeInterface[] $notifications */
+		$notifications = Notify::getForUser($this->user);
+		if (Request::ajax()) {
+			return $notifications;
+		}
+
+		return View::make(Config::get('laravel-notify::notify.views.index'), compact('notifications'));
+	}
+
+	/**
 	 * Display the specified resource.
-	 * GET /notify/{id}
+	 * GET /notify/{id}/{action}
 	 *
 	 * @param \Ipunkt\LaravelNotify\Models\Notification $notification
 	 * @param $action
