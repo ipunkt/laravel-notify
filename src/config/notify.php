@@ -1,13 +1,21 @@
 <?php
 
 return [
-    'enabled' => true,
-    'routes' => [
+	/**
+	 * is the package enabled
+	 */
+	'enabled' => true,
+
+	/**
+	 * route definitions
+	 */
+	'routes' => [
         /**
          * Route to index-Page
          * creates a route named "notify.index"
          */
         'index' => 'notify/index',
+
         /**
          * Route to an action
          * creates a route named "notify.action"
@@ -15,13 +23,17 @@ return [
          */
         'action' => 'notify/{notification}/{action}'
     ],
-    'views' => [
+
+	/**
+	 * view definitions
+	 */
+	'views' => [
         'index' => 'laravel-notify::notifications',
     ],
 
     /**
-     * Aktivitäten des Nutzers zu einer Notification (read, done, ...) werden automatisch beim Auslösen gesetzt
-     * und müssen nicht innerhalb der Action erstellt werden
+	 * A users activity for a notification (read, done, ...) will be set automatically and do not have to be set
+	 * in the action
      */
     'auto_add_activities_for_actions' => true,
 ];
