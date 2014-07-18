@@ -64,3 +64,13 @@ Then go to your layout and create an `<li id="notify"><a href="{{{ URL::route('n
 Whenever there are notifications to be listed the ViewComposer initially fills the `$notifications` variable in the
 	shipped `notification` view and the javascript makes an ajax call to get these and displays as menu. Without
 	javascript the link opens a page where all notifications will be listed.
+
+
+### Important Notice
+
+Do not forget to set filters for the routes build by the package.
+For example:
+
+	Route::when('notify/*', 'auth');
+
+This example adds the `auth` filter to all package build routes.
