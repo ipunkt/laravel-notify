@@ -10,24 +10,34 @@ namespace Ipunkt\LaravelNotify\Composers;
 
 
 use Ipunkt\LaravelNotify\Models\NotificationActivity;
+use Ipunkt\LaravelNotify\NotificationManager;
 
-class ViewComposer {
+class ViewComposer
+{
+	/**
+	 * authentication manager
+	 *
+	 * @var \Illuminate\Auth\Manager
+	 */
+	private $authManager;
 
 	/**
-	 * authentication
+	 * notification manager
 	 *
-	 * @var \Illuminate\Auth\Guard
+	 * @var \Ipunkt\LaravelNotify\NotificationManager
 	 */
-	private $auth;
+	private $notificationManager;
 
 	/**
-	 * inject the auth guard
+	 * inject the auth manager and notification manager
 	 *
-	 * @param \Illuminate\Auth\Guard $auth
+	 * @param \Illuminate\Auth\Manager $authManager
+	 * @param NotificationManager $notificationManager
 	 */
-	public function __construct(\Illuminate\Auth\Guard $auth)
+	public function __construct(\Illuminate\Auth\Manager $authManager, NotificationManager $notificationManager)
 	{
-		$this->auth = $auth;
+		$this->authManager = $authManager;
+		$this->notificationManager = $notificationManager;
 	}
 
 	/**
@@ -35,17 +45,17 @@ class ViewComposer {
 	 *
 	 * @param \Illuminate\View\View $view
 	 */
-	public function compose($view) {
-
+	public function compose(\Illuminate\View\View $view)
+	{
 		$notifications = [];
 
-		if (null !== $this->auth->user())
-		{
-			$notifications = Notify::getForUser($this->auth->user(), [NotificationActivity::CREATED, NotificationActivity::READ]);
+		if (null !== ($user = $this->auth->user())) {
+			$notifications = $this->notificationManager->getForUser($this->auth->user(), [
+				NotificationActivity::CREATED,
+				NotificationActivity::READ
+			]);
 		}
 
-
 		$view->with('notifications', $notifications);
-
 	}
 }

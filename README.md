@@ -41,3 +41,11 @@ Please be sure the name of the name of the created migration file in your `app/d
 
 Then run `php artisan migrate` to get the necessary tables in your database.
 
+## Usage
+
+Add somewhere in your bootstrap the shipped view composer to auto-handle the given view script:
+
+	View::composer('laravel-notify::notification', 'Ipunkt\LaravelNotify\Composers\ViewComposer');
+
+The view composer injects a variable `$notifications` into the view. It is a collection of all notifications that
+	were created or read.
