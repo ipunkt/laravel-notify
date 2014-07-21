@@ -98,6 +98,40 @@ class NotificationManager
     }
 
     /**
+     * get all Notifications as paginated items for the given user
+     * @param UserInterface $user
+     * @param array $activities
+     * @param int $itemsPerPage
+     * @return NotificationTypeInterface[]
+     */
+    public function getForUserPaginated(UserInterface $user = null, $activities = [], $itemsPerPage = 15)
+    {
+        if ($user === null && Auth::check()) {
+            $user = Auth::user();
+        }
+
+        if ($user === null) {
+            return [];
+        }
+
+        /** @var Notification[] $notificationModels */
+        $notificationModels = Notification::forUser($user, $activities)->reverse()->paginate($itemsPerPage);
+
+        /**
+         * Create NotificationTypes
+         */
+        $notifies = [
+            'items' => [],
+            'links' => $notificationModels->links(),
+        ];
+        /** @var Notification $notificationModel */
+        foreach ($notificationModels as $notificationModel) {
+            $notifies['items'][] = $this->instantiateNotification($notificationModel, $user);
+        }
+        return $notifies;
+    }
+
+    /**
      * @param Notification $notification
      * @param $action
      * @param UserInterface $user

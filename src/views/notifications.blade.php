@@ -6,3 +6,7 @@
 	<a href="{{{ $notification->getActionLink() }}}" class="alert-link">{{{ $notification }}}</a>
 </div>
 @endforeach
+
+@if (isset($links) && ! empty($links))
+	{{ $links }}
+@endif

@@ -52,13 +52,16 @@ class NotifyController extends \Controller
 	 */
 	public function all()
 	{
-		/** @var NotificationTypeInterface[] $notifications */
-		$notifications = Notify::getForUser($this->user);
-		if (Request::ajax()) {
-			return $notifications;
-		}
+		$notificationModels = Notify::getForUserPaginated($this->user, []);
 
-		return View::make(Config::get('laravel-notify::notify.views.index'), compact('notifications'));
+        /** @var NotificationTypeInterface[] $notifications */
+        $notifications = $notificationModels['items'];
+        $links = $notificationModels['links'];
+        if (Request::ajax()) {
+            return $notifications;
+        }
+
+		return View::make(Config::get('laravel-notify::notify.views.index'), compact('notifications', 'links'));
 	}
 
 	/**
