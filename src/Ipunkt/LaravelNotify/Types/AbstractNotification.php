@@ -141,5 +141,28 @@ abstract class AbstractNotification implements NotificationTypeInterface
 		return URL::route('notify.action', array('notification' => $this->model->id, 'action' => $action));
 	}
 
+	/**
+	 * is notification in given state
+	 *
+	 * @param string $state
+	 * @return bool
+	 */
+	public function is($state)
+	{
+		return $this->getModel()->currentState() === $state;
+	}
 
+	/**
+	 * returns data content
+	 *
+	 * @param string $key
+	 * @return mixed|null
+	 */
+	public function __get($key)
+	{
+		if (array_key_exists($key, $this->data))
+			return $this->data[$key];
+
+		return null;
+	}
 }
