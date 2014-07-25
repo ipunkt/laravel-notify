@@ -34,12 +34,7 @@ The Service provider also registers an alias `Notify` to your application.
 
 On command line publish the database migrations:
 
-	$> php artisan migrate:publish ipunkt/laravel-notify
-
-Please be sure the name of the name of the created migration file in your `app/database/migrations` folder has a name
- like `YYYY_mm_dd_hhiiss_notify_create_table_notifications.php`.
-
-Then run `php artisan migrate` to get the necessary tables in your database.
+	$> php artisan migrate --package="ipunkt/laravel-notify"
 
 ## Usage
 
