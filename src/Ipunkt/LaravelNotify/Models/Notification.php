@@ -5,6 +5,8 @@ use DB;
 use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
+use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
 
 /**
  * Created by PhpStorm.
@@ -15,8 +17,10 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * @property integer $id
  * @property array $data
- * @property string $job
- * @method static Builder forUser() forUser(UserInterface $user) forUser(UserInterface $user, array $activities)
+ * @property string $context
+ * @method static Builder forUser(UserInterface $user)
+ * @method static Builder withActivities(array $activities)
+ * @method static Builder withContext($context)
  * @method static Builder reverse()
  */
 class Notification extends Eloquent
@@ -24,12 +28,29 @@ class Notification extends Eloquent
 
     protected $table = 'notifications';
 
-    protected $fillable = ['job', 'data'];
+    protected $fillable = ['data','context'];
 
-    protected $notdynamic = ['id', 'job', 'data', 'created_at', 'updated_at', 'deleted_at'];
+    protected $notdynamic = ['id', 'context', 'data', 'created_at', 'updated_at', 'deleted_at'];
 
     /** @var UserInterface $user set scope to default user */
     protected $user = null;
+
+	/**
+	 * Publish new Notification
+	 *
+	 * @param NotificationTypeInterface $notification
+	 * @return \Illuminate\Database\Eloquent\Model|static
+	 */
+	public static function publish(NotificationTypeInterface $notification)
+	{
+		$attributes = ['data' => [serialize($notification)]];
+
+		if ($notification instanceof NotificationTypeContextInterface) {
+			$attributes['context'] = $notification->getContext();
+		}
+		return static::create($attributes);
+	}
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -71,10 +92,9 @@ class Notification extends Eloquent
     /**
      * @param Builder $query
      * @param UserInterface $user
-     * @param array $activities
      * @return Builder
      */
-    public function scopeForUser(Builder $query, UserInterface $user = null, array $activities = [])
+    public function scopeForUser(Builder $query, UserInterface $user = null)
     {
         if ($user === null && $this->user !== null) {
             $user = $this->user;
@@ -83,14 +103,42 @@ class Notification extends Eloquent
             return $query->has('activities');
         }
 
-        return $query->whereHas('activities', function ($q) use ($user, $activities) {
+        return $query->whereHas('activities', function ($q) use ($user) {
             $q->where('user_id', '=', $user->getAuthIdentifier());
-            if (!empty($activities)) {
-                /**  (SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = a.`notification_id` ORDER BY s.`id` DESC LIMIT 1) in ('created', 'read') */
-                $q->whereIn(DB::raw('(SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = `notification_activities`.`notification_id` ORDER BY s.`id` DESC LIMIT 1)'), $activities);
-            }
         });
     }
+    /**
+     * @param Builder $query
+     * @param array $activities
+     * @return Builder
+     */
+    public function scopeWithActivities(Builder $query, array $activities = [])
+    {
+	    if (empty($activities)) {
+		    return $query;
+	    }
+        return $query->whereHas('activities', function ($q) use ($activities) {
+            /**  (SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = a.`notification_id` ORDER BY s.`id` DESC LIMIT 1) in ('created', 'read') */
+            $q->whereIn(DB::raw('(SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = `notification_activities`.`notification_id` ORDER BY s.`id` DESC LIMIT 1)'), $activities);
+        });
+    }
+
+	/**
+	 * Add Like / = Condition for Context. use * as wildcard
+	 *
+	 * @param Builder $query
+	 * @param $context
+	 * @return Builder|static
+	 */
+	public function scopeWithContext(Builder $query, $context) {
+		$operator = '=';
+		if (str_contains($context, '*')) {
+			$operator = 'LIKE';
+			$context = str_replace('*', '%', $context);
+		}
+
+		return $query->where('context', $operator, $context);
+	}
 
 	/**
 	 * @param Builder $query

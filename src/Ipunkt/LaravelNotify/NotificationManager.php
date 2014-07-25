@@ -10,12 +10,11 @@ namespace Ipunkt\LaravelNotify;
 
 
 use Auth;
-use Closure;
-use Collection;
 use Config;
+use Ipunkt\LaravelNotify\Exceptions\ClassNotFoundException;
+use Ipunkt\LaravelNotify\Types\MessageNotification;
 use Redirect;
 use Illuminate\Auth\UserInterface;
-use Illuminate\Support\SerializableClosure;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
 use Ipunkt\LaravelNotify\Models\Notification;
 use Ipunkt\LaravelNotify\Models\NotificationActivity;
@@ -27,109 +26,144 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NotificationManager
 {
-    /** @var Collection notifications */
-    protected $notifications = null;
+	/** ------ Publish Notifications ---- **/
 
-    /**
-     * Create a new Notification for the user
-     *
-     * @param UserInterface|int $user
-     * @param string|Notification|callable $job
-     * @param array $data
-     */
-    public function user($user, $job, array $data = [])
+	/**
+	 * Create a new Notification for the user
+	 *
+	 * @param UserInterface|int $user
+	 * @param string|Notification|NotificationTypeInterface $notification
+	 */
+    public function user($user, $notification)
     {
-        $this->users([$user], $job, $data);
+        $this->users([$user], $notification);
     }
 
-    /**
-     * Create a new Notification for multiple users
-     * @param array $users of UserInterface
-     * @param string|Notification|callable $job
-     * @param array $data
-     */
-    public function users($users, $job, array $data = [])
+	/**
+	 * Create a new Notification for multiple users
+	 * @param array $users of UserInterface
+	 * @param string|Notification|NotificationTypeInterface $notification
+	 */
+    public function users($users, $notification)
     {
         /** @var Notification $notification */
-        $notification = $this->createNotification($job, $data);
+        $notification = $this->createNotification($notification);
 
         foreach ($users as $user) {
             $this->addActivity($notification, NotificationActivity::CREATED, $user);
         }
     }
 
-    /**
-     * Get all Notifications for the current authenticated user
-     * @return NotificationTypeInterface[]
-     */
-    public function get()
+	/**
+	 * Create a payload string from the given job and data.
+	 *
+	 * @param  NotificationTypeInterface|string|Notification $notification
+	 * @return Notification
+	 */
+	protected function createNotification($notification)
+	{
+		if ($notification instanceof NotificationTypeInterface) {
+			return Notification::publish($notification);
+		}
+
+		if ($notification instanceof Notification) {
+			return $notification;
+		}
+
+		return $this->createNotification(new MessageNotification($notification));
+	}
+
+
+	/** ------ Query Notifications ---- **/
+
+	/** @var string $context */
+	private $context = null;
+
+	/** @var array $activities */
+	private $activities = [];
+
+	/**
+	 * Get all Notifications for the current authenticated user
+	 * @param \Illuminate\Auth\UserInterface $user
+	 * @return NotificationTypeInterface[]
+	 */
+    public function get(UserInterface $user)
     {
-        return $this->getForUser();
+	    $query = $this->buildQuery($user);
+
+	    $notificationModels = $query->get();
+	    return $this->instantiateNotifications($notificationModels, $user);
     }
 
-    /**
-     * get all Notifications for the given user
-     * @param UserInterface $user
-     * @param array $activities
-     * @return NotificationTypeInterface[]
-     */
-    public function getForUser(UserInterface $user = null, $activities = [])
-    {
-        if ($user === null && Auth::check()) {
-            $user = Auth::user();
-        }
+	/**
+	 * returns paginated list of Notifications for the given user
+	 *
+	 * @param UserInterface $user
+	 * @param int $itemsPerPage
+	 * @return array
+	 */
+	public function paginate(UserInterface $user, $itemsPerPage = 15)
+	{
+		$query = $this->buildQuery($user);
 
-        if ($user === null) {
-            return [];
-        }
+		$paginatorModels = $query->paginate($itemsPerPage);
 
-        /** @var Notification[] $notificationModels */
-        $notificationModels = Notification::forUser($user, $activities)->reverse()->get();
+		return [
+			'items' => $this->instantiateNotifications($paginatorModels, $user),
+			'links' => $paginatorModels->links(),
+		];
+	}
 
-        /**
-         * Create NotificationTypes
-         */
-        $notifies = [];
-        /** @var Notification $notificationModel */
-        foreach ($notificationModels as $notificationModel) {
-            $notifies[] = $this->instantiateNotification($notificationModel, $user);
-        }
-        return $notifies;
-    }
+	/**
+	 * builds a query by given flags
+	 *
+	 * @param UserInterface $user
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	private function buildQuery(UserInterface $user)
+	{
+		$query = Notification::forUser($user);
 
-    /**
-     * get all Notifications as paginated items for the given user
-     * @param UserInterface $user
-     * @param array $activities
-     * @param int $itemsPerPage
-     * @return NotificationTypeInterface[]
-     */
-    public function getForUserPaginated(UserInterface $user = null, $activities = [], $itemsPerPage = 15)
-    {
-        if ($user === null && Auth::check()) {
-            $user = Auth::user();
-        }
+		if (!empty($this->activities))
+		{
+			$query->withActivities($this->activities);
+		}
 
-        if ($user === null) {
-            return [];
-        }
+		if (!empty($this->context))
+		{
+			$query->withContext($this->context);
+		}
 
-        /** @var Notification[] $notificationModels */
-        $notificationModels = Notification::forUser($user, $activities)->reverse()->paginate($itemsPerPage);
+		$query->reverse();
 
-        /**
-         * Create NotificationTypes
-         */
-        $notifies = [
-            'items' => [],
-            'links' => $notificationModels->links(),
-        ];
-        /** @var Notification $notificationModel */
-        foreach ($notificationModels as $notificationModel) {
-            $notifies['items'][] = $this->instantiateNotification($notificationModel, $user);
-        }
-        return $notifies;
-    }
+		return $query;
+	}
+
+	/**
+	 * set activities
+	 *
+	 * @param array $activities
+	 * @return $this
+	 */
+	public function withActivities(array $activities)
+	{
+		$this->activities = $activities;
+		return $this;
+	}
+
+	/**
+	 * sets context
+	 *
+	 * @param string $context * for wildcard
+	 * @return $this
+	 */
+	public function inContext($context)
+	{
+		$this->context = $context;
+		return $this;
+	}
+
+	/** ------ Activate Actions ---- **/
 
     /**
      * @param Notification $notification
@@ -148,7 +182,6 @@ class NotificationManager
         }
         return Redirect::back();
     }
-
 
     /**
      * Add a new Activity to the Notfication for the user
@@ -183,81 +216,41 @@ class NotificationManager
         return ($notification->activities()->save($user_activity) !== false);
     }
 
-    /**
-     * @param Notification $notification
-     * @param null|UserInterface $user
-     * @return null|NotificationTypeInterface
-     */
-    protected function instantiateNotification(Notification $notification, UserInterface $user = null)
-    {
-        if ($user === null && Auth::check()) {
-            $user = Auth::user();
-        }
+	/**
+	 * instantiates notification types
+	 *
+	 * @param Notification[] $notificationModels
+	 * @param UserInterface $user
+	 * @return array
+	 */
+	private function instantiateNotifications($notificationModels, UserInterface $user)
+	{
+		/**
+		 * Create NotificationTypes
+		 */
+		$notifies = [];
+		/** @var Notification $notificationModel */
+		foreach ($notificationModels as $notificationModel) {
+			$notifies[] = $this->instantiateNotification($notificationModel, $user);
+		}
+		return $notifies;
+	}
 
-        /**
-         * Userscope im Model setzen
-         */
+	/**
+	 * @param Notification $notification
+	 * @param null|UserInterface $user
+	 * @throws Exceptions\ClassNotFoundException
+	 * @return NotificationTypeInterface
+	 */
+    protected function instantiateNotification(Notification $notification, UserInterface $user)
+    {
         $notification->setUser($user);
 
-        if ($notification->job === 'serialize') {
-            $notifytype = unserialize($notification->data[0]);
-            return $notifytype->setModel($notification);
-        }
+        $notifytype = unserialize($notification->data[0]);
+	    if($notifytype instanceof NotificationTypeInterface) {
+		    return $notifytype->setModel($notification);
+	    }
 
-        if (class_exists($notification->job)) {
-            $jobclass = $notification->job;
-            $notifytype = new $jobclass();
-            return $notifytype->setModel($notification)->setData($notification->data);
-        }
-
-        /**
-         * TODO throw NotificationClassNotFoundException
-         */
-        return null;
-    }
-
-    /**
-     * Create a payload string for the given Closure job.
-     *
-     * @param  \Closure $job
-     * @param  array $data
-     * @return string
-     */
-    protected function createClosurePayload($job, array $data = [])
-    {
-        $data['closure'] = serialize(new SerializableClosure($job));
-
-        return array('job' => 'Ipunkt\LaravelNotify\Types\ClosureNotification', 'data' => $data);
-    }
-
-
-    /**
-     * Create a payload string from the given job and data.
-     *
-     * @param  string $job
-     * @param  array $data
-     * @return Notification
-     */
-    protected function createNotification($job, array $data = [])
-    {
-        if ($job instanceof Closure) {
-            $payload = $this->createClosurePayload($job, $data);
-            return Notification::create($payload);
-        }
-
-        if ($job instanceof NotificationTypeInterface) {
-            return Notification::create(['job' => 'serialize', 'data' => [serialize($job)]]);
-        }
-
-        if (class_exists($job)) {
-            return Notification::create(['job' => $job, 'data' => $data]);
-        }
-
-	    if ($job instanceof Notification) {
-            return $job;
-        }
-
-        $data['message'] = $job;
-        return $this->createNotification('Ipunkt\LaravelNotify\Types\MessageNotification', $data);
+	    throw new ClassNotFoundException;
     }
 }

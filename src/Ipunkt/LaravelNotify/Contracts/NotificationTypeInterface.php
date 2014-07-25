@@ -23,11 +23,6 @@ interface NotificationTypeInterface extends JsonSerializable
     public function setModel(Notification $notification);
 
     /**
-     * @return array
-     */
-    public function getData();
-
-    /**
      * @return Notification
      */
     public function getModel();
@@ -37,16 +32,6 @@ interface NotificationTypeInterface extends JsonSerializable
      * @return string
      */
     public function show();
-
-    /**
-     * @return string
-     */
-    public function __toString();
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize();
 
     /**
      * Do the read-Action

@@ -26,6 +26,9 @@ abstract class AbstractNotification implements NotificationTypeInterface
 	/** @var Notification */
 	protected $model = null;
 
+	/** @var string $message */
+	protected $message = '';
+
 	/**
 	 * Set Notification Model
 	 * @param Notification $notification
@@ -62,9 +65,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
 	 */
 	public function show()
 	{
-		if (isset($this->data['message'])) {
-			return Lang::get($this->data['message'], $this->data);
-		}
+		return Lang::get($this->message, $this->data);
 	}
 
 	/**
@@ -85,6 +86,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
 			'id' => $this->model->id,
 			'show' => $this->show(),
 			'link' => $this->getActionLink('read'),
+			'message' => $this->message,
 			'data' => $this->data,
 			'state' => $latestActivity->activity,
 			'updated_at' => $latestActivity->created_at,

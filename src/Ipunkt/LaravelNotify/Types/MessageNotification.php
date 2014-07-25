@@ -12,4 +12,11 @@ namespace Ipunkt\LaravelNotify\Types;
 class MessageNotification extends AbstractNotification
 {
 
+	/**
+	 * @param string $message
+	 */
+	public function __construct($message) {
+		$this->message = $message;
+	}
+
 }
