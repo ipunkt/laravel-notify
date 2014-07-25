@@ -11,7 +11,7 @@ namespace Ipunkt\LaravelNotify;
 
 use Auth;
 use Config;
-use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
+use Illuminate\Support\Collection;
 use Ipunkt\LaravelNotify\Exceptions\ClassNotFoundException;
 use Ipunkt\LaravelNotify\Types\MessageNotification;
 use Redirect;
@@ -86,7 +86,7 @@ class NotificationManager
 	/**
 	 * Get all Notifications for the current authenticated user
 	 * @param \Illuminate\Auth\UserInterface $user
-	 * @return NotificationTypeInterface[]
+	 * @return NotificationTypeInterface[]|Collection
 	 */
     public function get(UserInterface $user)
     {
@@ -172,7 +172,7 @@ class NotificationManager
      * @param UserInterface $user
      * @return Response
      */
-    public function doAction(Notification $notification, $action, UserInterface $user = null)
+    public function doAction(Notification $notification, $action, UserInterface $user)
     {
         $class = $this->instantiateNotification($notification, $user);
         if (method_exists($class, $action)) {
@@ -185,7 +185,7 @@ class NotificationManager
     }
 
     /**
-     * Add a new Activity to the Notfication for the user
+     * Add a new Activity to the Notification for the user
      * @param Notification $notification
      * @param string $activity
      * @param UserInterface $user
@@ -222,17 +222,17 @@ class NotificationManager
 	 *
 	 * @param Notification[] $notificationModels
 	 * @param UserInterface $user
-	 * @return array
+	 * @return NotificationTypeInterface[]|Collection
 	 */
 	private function instantiateNotifications($notificationModels, UserInterface $user)
 	{
 		/**
 		 * Create NotificationTypes
 		 */
-		$notifies = [];
+		$notifies = new Collection();
 		/** @var Notification $notificationModel */
 		foreach ($notificationModels as $notificationModel) {
-			$notifies[] = $this->instantiateNotification($notificationModel, $user);
+			$notifies->push($this->instantiateNotification($notificationModel, $user));
 		}
 		return $notifies;
 	}
