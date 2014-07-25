@@ -11,6 +11,7 @@ namespace Ipunkt\LaravelNotify;
 
 use Auth;
 use Config;
+use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
 use Ipunkt\LaravelNotify\Exceptions\ClassNotFoundException;
 use Ipunkt\LaravelNotify\Types\MessageNotification;
 use Redirect;

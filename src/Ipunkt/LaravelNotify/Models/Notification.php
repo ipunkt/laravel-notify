@@ -47,8 +47,23 @@ class Notification extends Eloquent
 
 		if ($notification instanceof NotificationTypeContextInterface) {
 			$attributes['context'] = $notification->getContext();
+			if ($notification->isSingleton()) {
+				return static::updateSingleton($attributes);
+			}
 		}
 		return static::create($attributes);
+	}
+
+	/**
+	 * Update a singleton notification
+	 *
+	 * @param array $attributes
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
+	 */
+	protected static function updateSingleton(array $attributes) {
+		$notification = static::where('context','=',$attributes['context'])->first();
+		$notification->fill($attributes)->save();
+		return $notification;
 	}
 
 
