@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class NotifyCreateTableNotifications extends Migration
 {
@@ -13,6 +13,12 @@ class NotifyCreateTableNotifications extends Migration
      */
     public function up()
     {
+	    if (Schema::hasTable('notifications') ||
+	        Schema::hasTable('notification_activities'))
+	    {
+		    return;
+	    }
+
         /**
          * Create Table Notifications
          */
