@@ -110,7 +110,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
 	 */
 	public function read()
 	{
-		return Notify::doAction($this->model, NotificationActivity::DONE);
+		return Notify::doAction($this->model, NotificationActivity::DONE, $this->model->getUser());
 	}
 
 	/**
