@@ -61,7 +61,7 @@ class Notification extends Eloquent
 	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	protected static function updateSingleton(array $attributes) {
-		$notification = static::where('context','=',$attributes['context'])->first();
+		$notification = static::firstOrCreate(['context' => $attributes['context']]);
 		$notification->fill($attributes)->save();
 		return $notification;
 	}
