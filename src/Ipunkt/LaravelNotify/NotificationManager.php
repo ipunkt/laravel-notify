@@ -35,25 +35,25 @@ class NotificationManager
 	 * @param UserInterface|int $user
 	 * @param string|Notification|NotificationTypeInterface $notification
 	 */
-    public function user($user, $notification)
-    {
-        $this->users([$user], $notification);
-    }
+	public function user($user, $notification)
+	{
+		$this->users([$user], $notification);
+	}
 
 	/**
 	 * Create a new Notification for multiple users
 	 * @param array $users of UserInterface
 	 * @param string|Notification|NotificationTypeInterface $notification
 	 */
-    public function users($users, $notification)
-    {
-        /** @var Notification $notification */
-        $notification = $this->createNotification($notification);
+	public function users($users, $notification)
+	{
+		/** @var Notification $notification */
+		$notification = $this->createNotification($notification);
 
-        foreach ($users as $user) {
-            $this->addActivity($notification, NotificationActivity::CREATED, $user);
-        }
-    }
+		foreach ($users as $user) {
+			$this->addActivity($notification, NotificationActivity::CREATED, $user);
+		}
+	}
 
 	/**
 	 * Create a payload string from the given job and data.
@@ -88,13 +88,13 @@ class NotificationManager
 	 * @param \Illuminate\Auth\UserInterface $user
 	 * @return NotificationTypeInterface[]|Collection
 	 */
-    public function get(UserInterface $user)
-    {
-	    $query = $this->buildQuery($user);
+	public function get(UserInterface $user)
+	{
+		$query = $this->buildQuery($user);
 
-	    $notificationModels = $query->get();
-	    return $this->instantiateNotifications($notificationModels, $user);
-    }
+		$notificationModels = $query->get();
+		return $this->instantiateNotifications($notificationModels, $user);
+	}
 
 	/**
 	 * returns paginated list of Notifications for the given user
@@ -166,56 +166,56 @@ class NotificationManager
 
 	/** ------ Activate Actions ---- **/
 
-    /**
-     * @param Notification $notification
-     * @param $action
-     * @param UserInterface $user
-     * @return Response
-     */
-    public function doAction(Notification $notification, $action, UserInterface $user)
-    {
-        $class = $this->instantiateNotification($notification, $user);
-        if (method_exists($class, $action)) {
-            if (Config::get('laravel-notify::notify.auto_add_activities_for_actions')) {
-                $this->addActivity($notification, $action);
-            }
-            return $class->$action();
-        }
-        return Redirect::back();
-    }
+	/**
+	 * @param Notification $notification
+	 * @param $action
+	 * @param UserInterface $user
+	 * @return Response
+	 */
+	public function doAction(Notification $notification, $action, UserInterface $user)
+	{
+		$class = $this->instantiateNotification($notification, $user);
+		if (method_exists($class, $action)) {
+			if (Config::get('laravel-notify::notify.auto_add_activities_for_actions')) {
+				$this->addActivity($notification, $action);
+			}
+			return $class->$action();
+		}
+		return Redirect::back();
+	}
 
-    /**
-     * Add a new Activity to the Notification for the user
-     * @param Notification $notification
-     * @param string $activity
-     * @param UserInterface $user
-     * @return bool
-     */
-    public function addActivity(Notification $notification, $activity, UserInterface $user = null)
-    {
-        if ($user === null && $notification->hasUser()) {
-            $user = $notification->getUser();
-        }
+	/**
+	 * Add a new Activity to the Notification for the user
+	 * @param Notification $notification
+	 * @param string $activity
+	 * @param UserInterface $user
+	 * @return bool
+	 */
+	public function addActivity(Notification $notification, $activity, UserInterface $user = null)
+	{
+		if ($user === null && $notification->hasUser()) {
+			$user = $notification->getUser();
+		}
 
-        if ($user === null && Auth::check()) {
-            $user = Auth::user();
-        }
+		if ($user === null && Auth::check()) {
+			$user = Auth::user();
+		}
 
-        if ($user === null) {
-            return false;
-        }
+		if ($user === null) {
+			return false;
+		}
 
-        /**
-         * Aktuellen Status nicht erneut setzen
-         */
-        if ($notification->currentState($user) === $activity) {
-            return false;
-        }
+		/**
+		 * Aktuellen Status nicht erneut setzen
+		 */
+		if ($notification->currentState($user) === $activity) {
+			return false;
+		}
 
-        /** @var NotificationActivity $user_activity */
-        $user_activity = new NotificationActivity(['activity' => $activity, 'user_id' => $user->getAuthIdentifier()]);
-        return ($notification->activities()->save($user_activity) !== false);
-    }
+		/** @var NotificationActivity $user_activity */
+		$user_activity = new NotificationActivity(['activity' => $activity, 'user_id' => $user->getAuthIdentifier()]);
+		return ($notification->activities()->save($user_activity) !== false);
+	}
 
 	/**
 	 * instantiates notification types
@@ -243,15 +243,15 @@ class NotificationManager
 	 * @throws Exceptions\ClassNotFoundException
 	 * @return NotificationTypeInterface
 	 */
-    protected function instantiateNotification(Notification $notification, UserInterface $user)
-    {
-        $notification->setUser($user);
+	protected function instantiateNotification(Notification $notification, UserInterface $user)
+	{
+		$notification->setUser($user);
 
-        $notifytype = unserialize($notification->data[0]);
-	    if($notifytype instanceof NotificationTypeInterface) {
-		    return $notifytype->setModel($notification);
-	    }
+		$notifytype = unserialize($notification->data[0]);
+		if($notifytype instanceof NotificationTypeInterface) {
+			return $notifytype->setModel($notification);
+		}
 
-	    throw new ClassNotFoundException;
-    }
+		throw new ClassNotFoundException;
+	}
 }
