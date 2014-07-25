@@ -36,7 +36,7 @@ class NotifyController extends \Controller
     public function index()
     {
         /** @var NotificationTypeInterface[] $notifications */
-        $notifications = Notify::getForUser($this->user, [NotificationActivity::CREATED, NotificationActivity::READ]);
+        $notifications = Notify::withActivities([NotificationActivity::CREATED, NotificationActivity::READ])->get($this->user);
         if (Request::ajax()) {
             return $notifications;
         }
@@ -52,7 +52,7 @@ class NotifyController extends \Controller
 	 */
 	public function all()
 	{
-		$notificationModels = Notify::getForUserPaginated($this->user, []);
+		$notificationModels = Notify::paginate($this->user);
 
         /** @var NotificationTypeInterface[] $notifications */
         $notifications = $notificationModels['items'];
