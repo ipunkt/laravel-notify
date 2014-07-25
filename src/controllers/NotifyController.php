@@ -77,7 +77,7 @@ class NotifyController extends \Controller
     {
     	if (Request::ajax())
         {
-            return Notify::addActivity($notification, $action, $this->user);
+            return [Notify::addActivity($notification, $action, $this->user)];
         }
         return Notify::doAction($notification, $action, $this->user);
     }
