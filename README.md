@@ -6,27 +6,8 @@ Provides an ready to use object oriented notification interface for laravel 4, i
 
 Add to your composer.json following lines
 
-	"repositories": [
-		{
-			"type": "package",
-			"package": {
-				"name": "ipunkt/laravel-notify",
-				"version": "master",
-				"dist": {
-					"url": "https://github.com/ipunkt/laravel-notify/archive/master.zip",
-					"type": "zip"
-				},
-				"autoload": {
-					"psr-0": {
-						"Ipunkt\\LaravelNotify\\": "src/"
-					}
-				}
-			}
-		}
-	]
-
 	"require": {
-		"ipunkt/laravel-notify": "*"
+		"ipunkt/laravel-notify": "1.*"
 	}
 
 Add `'Ipunkt\LaravelNotify\LaravelNotifyServiceProvider',` to `providers` in `app/config/app.php`.
@@ -69,3 +50,27 @@ For example:
 	Route::when('notify/*', 'auth');
 
 This example adds the `auth` filter to all package build routes.
+
+## Use-Cases
+### 1. Message Notification
+
+If you want to publish a simple message notification just do the following to notify users:
+
+	$user = Auth::user();
+	Notify::user($user, new \Ipunkt\LaravelNotify\Types\MessageNotification('Welcome on board!'));
+	// or
+	// Notify::users([$user, ...], new \Ipunkt\LaravelNotify\Types\MessageNotification('Welcome on board!'));
+
+This sends a simple shipped message notification to the current logged in user.
+
+### 2. Specific Notification
+
+For sending application specific notifications simply create your own NotificationType.
+
+	class MyNotification extends Ipunkt\LaravelNotify\Types\AbstractNotification {
+	}
+
+Then you can modify the read and done action for your needs. And you can add your own custom actions. You do not have to
+ use only these 3 actions: `created`, `read`, `done`. You can build your own custom workflow. Try it out!
+ The AbstractNotification sends a user to the done action if he reads the notification. Override this behaviour th have
+ your own workflow. Ending with `done` might be a good one, starting with `created` is fix by the current implementation.
