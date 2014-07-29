@@ -1,4 +1,5 @@
 # laravel-notify
+[![Latest Stable Version](https://poser.pugx.org/ipunkt/laravel-notify/v/stable.svg)](https://packagist.org/packages/ipunkt/laravel-notify) [![Latest Unstable Version](https://poser.pugx.org/ipunkt/laravel-notify/v/unstable.svg)](https://packagist.org/packages/ipunkt/laravel-notify) [![License](https://poser.pugx.org/ipunkt/laravel-notify/license.svg)](https://packagist.org/packages/ipunkt/laravel-notify) [![Total Downloads](https://poser.pugx.org/ipunkt/laravel-notify/downloads.svg)](https://packagist.org/packages/ipunkt/laravel-notify)
 
 Provides an ready to use object oriented notification interface for laravel 4, including working example javascript and css for Twitter Bootstrap 3
 
