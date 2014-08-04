@@ -73,5 +73,6 @@ For sending application specific notifications simply create your own Notificati
 
 Then you can modify the read and done action for your needs. And you can add your own custom actions. You do not have to
  use only these 3 actions: `created`, `read`, `done`. You can build your own custom workflow. Try it out!
- The AbstractNotification sends a user to the done action if he reads the notification. Override this behaviour th have
+
+The AbstractNotification sends a user to the done action if he reads the notification. Override this behaviour to have
  your own workflow. Ending with `done` might be a good one, starting with `created` is fix by the current implementation.
