@@ -29,6 +29,12 @@ abstract class AbstractNotification implements NotificationTypeInterface
 	/** @var string $message */
 	protected $message = '';
 
+    /** @var array add activity for these status without calling addActivity explicit */
+    protected $autoActivities = ['created','read','done'];
+
+    /** @var array add these activities to all assigned users */
+    protected $groupedActivities = [];
+
 	/**
 	 * Set Notification Model
 	 * @param Notification $notification
@@ -154,7 +160,23 @@ abstract class AbstractNotification implements NotificationTypeInterface
 		return $this->getModel()->currentState() === $state;
 	}
 
-	/**
+    /**
+     * @param $activity
+     * @return bool
+     */
+    public function isGrouped($activity) {
+        return in_array($activity,$this->groupedActivities);
+    }
+
+    /**
+     * @param $activity
+     * @return bool
+     */
+    public function isDoAutoAddActivity($activity) {
+        return in_array($activity,$this->autoActivities);
+    }
+
+    /**
 	 * returns data content
 	 *
 	 * @param string $key

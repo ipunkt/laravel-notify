@@ -52,4 +52,25 @@ interface NotificationTypeInterface extends JsonSerializable
      * @return Response
      */
     public function delete();
+
+    /**
+     * is notification in given state
+     *
+     * @param string $state
+     * @return bool
+     */
+    public function is($state);
+
+    /**
+     * @param $activity
+     * @return bool
+     */
+    public function isGrouped($activity);
+
+    /**
+     * @param $activity
+     * @return bool
+     */
+    public function isDoAutoAddActivity($activity);
+
 }

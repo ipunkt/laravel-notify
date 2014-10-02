@@ -36,4 +36,9 @@ class NotificationActivity extends Eloquent
         return $this->belongsTo('Ipunkt\LaravelNotify\Models\Notification');
     }
 
+    public function user()
+    {
+        return $this->hasOne('Illuminate\Auth\UserInterface');
+    }
+
 }

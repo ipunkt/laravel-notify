@@ -76,6 +76,14 @@ class Notification extends Eloquent
     }
 
     /**
+     * @return mixed
+     */
+    public function user()
+    {
+        return $this->hasManyThrough('Illuminate\Auth\UserInterface', 'Ipunkt\LaravelNotify\Models\NotificationActivity', 'notification_id', 'user_id');
+    }
+
+    /**
      * Set Default User-Scope
      * @param UserInterface $user
      * @return $this

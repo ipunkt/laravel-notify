@@ -176,11 +176,29 @@ class NotificationManager
 	{
 		$class = $this->instantiateNotification($notification, $user);
 		if (method_exists($class, $action)) {
-			if (Config::get('laravel-notify::notify.auto_add_activities_for_actions')) {
+			if (Config::get('laravel-notify::notify.auto_add_activities_for_actions') && $class->isDoAutoAddActivity($action)) {
 				$this->addActivity($notification, $action);
 			}
 			return $class->$action();
 		}
+		return Redirect::back();
+	}
+
+	/**
+	 * @param Notification $notification
+	 * @param $action
+	 * @param UserInterface $user
+	 * @return Response
+	 */
+	public function undoAction(Notification $notification, $action, UserInterface $user)
+	{
+		$class = $this->instantiateNotification($notification, $user);
+        if (method_exists($class, 'un'.$action)) {
+            if (Config::get('laravel-notify::notify.auto_add_activities_for_actions') && $class->isDoAutoAddActivity('un'.$action)) {
+                $this->removeActivity($notification, $action);
+            }
+            return $class->{'un'.$action}();
+        }
 		return Redirect::back();
 	}
 
@@ -215,6 +233,38 @@ class NotificationManager
 		/** @var NotificationActivity $user_activity */
 		$user_activity = new NotificationActivity(['activity' => $activity, 'user_id' => $user->getAuthIdentifier()]);
 		return ($notification->activities()->save($user_activity) !== false);
+	}
+
+	/**
+	 * Remove an Activity from the Notification for the user
+	 * @param Notification $notification
+	 * @param string $activity
+	 * @param UserInterface $user
+	 * @return bool
+	 */
+	public function removeActivity(Notification $notification, $activity, UserInterface $user = null)
+	{
+		if ($user === null && $notification->hasUser()) {
+			$user = $notification->getUser();
+		}
+
+		if ($user === null && Auth::check()) {
+			$user = Auth::user();
+		}
+
+		if ($user === null) {
+			return false;
+		}
+
+		try {
+            $user_activity = NotificationActivity::firstOrFail(['notification_id' => $notification->getKey(), 'activity' => $activity, 'user_id' => $user->getAuthIdentifier()]);
+            if ($user_activity ->delete()) {
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            return false;
+        }
 	}
 
 	/**
