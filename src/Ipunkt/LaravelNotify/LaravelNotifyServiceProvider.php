@@ -75,19 +75,19 @@ class LaravelNotifyServiceProvider extends ServiceProvider {
 		//  setting the route to index
 		$router->get($config->get('laravel-notify::notify.routes.index'), [
 			'as' => 'notify.index',
-			'uses' => 'Ipunkt\LaravelNotify\Controllers\NotifyController@index'
+			'uses' => $config->get('laravel-notify::notify.controller').'@index'
 		]);
 
 		//  setting the route to all
 		$router->get($config->get('laravel-notify::notify.routes.all'), [
 			'as' => 'notify.all',
-			'uses' => 'Ipunkt\LaravelNotify\Controllers\NotifyController@all'
+			'uses' => $config->get('laravel-notify::notify.controller').'@all'
 		]);
 
 		//  setting the route to do an action
 		$router->get($config->get('laravel-notify::notify.routes.action'), [
 			'as' => 'notify.action',
-			'uses' => 'Ipunkt\LaravelNotify\Controllers\NotifyController@action'
+			'uses' => $config->get('laravel-notify::notify.controller').'@action'
 		]);
 	}
 

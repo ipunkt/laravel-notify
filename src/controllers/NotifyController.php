@@ -3,6 +3,7 @@ namespace Ipunkt\LaravelNotify\Controllers;
 
 use Illuminate\Auth\UserInterface;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
+use Ipunkt\LaravelNotify\Contracts\NotifyControllerInterface;
 use Ipunkt\LaravelNotify\Models\Notification;
 use Ipunkt\LaravelNotify\Models\NotificationActivity;
 use Auth;
@@ -12,7 +13,7 @@ use View;
 use Config;
 use Response;
 
-class NotifyController extends \Controller
+class NotifyController extends \Controller implements NotifyControllerInterface
 {
     /**
      * @var UserInterface
@@ -66,11 +67,10 @@ class NotifyController extends \Controller
 
 	/**
 	 * Display the specified resource.
-	 * GET /notify/{id}/{action}
+	 * GET /notify/{notification}/{action}
 	 *
 	 * @param \Ipunkt\LaravelNotify\Models\Notification $notification
 	 * @param $action
-	 * @internal param int $id
 	 * @return Response
 	 */
     public function action(Notification $notification, $action)

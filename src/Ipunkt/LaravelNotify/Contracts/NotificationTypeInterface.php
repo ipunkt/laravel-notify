@@ -62,13 +62,15 @@ interface NotificationTypeInterface extends JsonSerializable
     public function is($state);
 
     /**
-     * @param $activity
+     * Should all users get this Activity set?
+     * @param string $activity
      * @return bool
      */
     public function isGrouped($activity);
 
     /**
-     * @param $activity
+     * Should this activity automatically been logged
+     * @param string $activity
      * @return bool
      */
     public function isDoAutoAddActivity($activity);

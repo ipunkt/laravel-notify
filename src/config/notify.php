@@ -6,6 +6,12 @@ return [
 	 */
 	'enabled' => true,
 
+    /**
+     * Controller used for routes
+     * @see Ipunkt\LaravelNotify\Contracts\NotifyControllerInterface
+     */
+    'controller' => 'Ipunkt\LaravelNotify\Controllers\NotifyController',
+
 	/**
 	 * route definitions
 	 */
