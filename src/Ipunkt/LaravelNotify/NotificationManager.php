@@ -259,7 +259,10 @@ class NotificationManager
 		}
 
 		try {
-            $user_activity = NotificationActivity::firstOrFail(['notification_id' => $notification->getKey(), 'activity' => $activity, 'user_id' => $user->getAuthIdentifier()]);
+            /**
+             * using index
+             */
+            $user_activity = $notification->activities()->where('user_id',$user->getAuthIdentifier())->where('activity',$activity)->firstOrFail();
             if ($user_activity ->delete()) {
                 return true;
             }
