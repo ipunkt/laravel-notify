@@ -62,7 +62,7 @@ class NotifyController extends \Controller implements NotifyControllerInterface
             return $notifications;
         }
 
-		return View::make(Config::get('laravel-notify::notify.views.index'), compact('notifications', 'links'));
+		return View::make(Config::get('laravel-notify::notify.views.all'), compact('notifications', 'links'));
 	}
 
 	/**
@@ -70,7 +70,7 @@ class NotifyController extends \Controller implements NotifyControllerInterface
 	 * GET /notify/{notification}/{action}
 	 *
 	 * @param \Ipunkt\LaravelNotify\Models\Notification $notification
-	 * @param $action
+	 * @param string $action
 	 * @return Response
 	 */
     public function action(Notification $notification, $action)
