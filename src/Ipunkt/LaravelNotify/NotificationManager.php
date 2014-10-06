@@ -167,38 +167,40 @@ class NotificationManager
 	/** ------ Activate Actions ---- **/
 
 	/**
+     * Do or undo actions
 	 * @param Notification $notification
-	 * @param $action
+	 * @param string $action Name of the action (if starts with 'un' tries to undo the action)
 	 * @param UserInterface $user
-	 * @return Response
+	 * @return Response Redirect::back() by default
 	 */
 	public function doAction(Notification $notification, $action, UserInterface $user)
 	{
+        /** @var NotificationTypeInterface $class */
 		$class = $this->instantiateNotification($notification, $user);
+        /**
+         * If action starts with 'un' and original method exists
+         */
+        if (strpos($action,'un') === 0) {
+            if (method_exists($class,$unaction = substr($action,2))) {
+                /**
+                 * check Autobehavior of action to undo
+                 */
+                if ($class->isDoAutoLogActivity($unaction)) {
+                    $this->removeActivity($notification, $unaction);
+                }
+            }
+        }
+
+        /**
+         * if action exists as method in NotificationType
+         */
 		if (method_exists($class, $action)) {
-			if (Config::get('laravel-notify::notify.auto_add_activities_for_actions') && $class->isDoAutoAddActivity($action)) {
+			if ($class->isDoAutoLogActivity($action)) {
 				$this->addActivity($notification, $action);
 			}
 			return $class->$action();
 		}
-		return Redirect::back();
-	}
 
-	/**
-	 * @param Notification $notification
-	 * @param $action
-	 * @param UserInterface $user
-	 * @return Response
-	 */
-	public function undoAction(Notification $notification, $action, UserInterface $user)
-	{
-		$class = $this->instantiateNotification($notification, $user);
-        if (method_exists($class, 'un'.$action)) {
-            if (Config::get('laravel-notify::notify.auto_add_activities_for_actions') && $class->isDoAutoAddActivity('un'.$action)) {
-                $this->removeActivity($notification, $action);
-            }
-            return $class->{'un'.$action}();
-        }
 		return Redirect::back();
 	}
 
@@ -236,7 +238,7 @@ class NotificationManager
 	}
 
 	/**
-	 * Remove an Activity from the Notification for the user
+	 * Remove / delete an activity from the Notification for the user
 	 * @param Notification $notification
 	 * @param string $activity
 	 * @param UserInterface $user

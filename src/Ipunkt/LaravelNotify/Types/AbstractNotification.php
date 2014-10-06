@@ -172,7 +172,7 @@ abstract class AbstractNotification implements NotificationTypeInterface
      * @param $activity
      * @return bool
      */
-    public function isDoAutoAddActivity($activity) {
+    public function isDoAutoLogActivity($activity) {
         return in_array($activity,$this->autoActivities);
     }
 

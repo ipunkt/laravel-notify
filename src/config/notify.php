@@ -41,11 +41,7 @@ return [
 	 */
 	'views' => [
         'index' => 'laravel-notify::notifications',
+        'all' => 'laravel-notify::notifications',
     ],
 
-    /**
-	 * A users activity for a notification (read, done, ...) will be set automatically and do not have to be set
-	 * in the action
-     */
-    'auto_add_activities_for_actions' => true,
 ];

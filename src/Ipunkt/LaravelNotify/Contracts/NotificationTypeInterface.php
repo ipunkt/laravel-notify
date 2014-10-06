@@ -73,6 +73,6 @@ interface NotificationTypeInterface extends JsonSerializable
      * @param string $activity
      * @return bool
      */
-    public function isDoAutoAddActivity($activity);
+    public function isDoAutoLogActivity($activity);
 
 }
