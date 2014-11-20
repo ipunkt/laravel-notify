@@ -7,12 +7,17 @@
         {
             "name": "Bastian Rang (ipunkt Business Solutions)",
             "email": "br@ipunkt.biz"
-        }
+		},
+		{
+			"name": "Robert Kummer (ipunkt Business Solutions)",
+			"email": "rok@ipunkt.biz"
+		}
     ],
     "require": {
         "php": ">=5.4.0",
-        "laravel/framework": "4.x",
-        "illuminate/support": "4.x"
+		"illuminate/support": "~4.0",
+		"illuminate/auth": "~4.0",
+		"illuminate/database": "~4.0"
     },
     "autoload": {
         "classmap": [

@@ -5,6 +5,7 @@ use DB;
 use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
 
@@ -18,6 +19,8 @@ use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
  * @property integer $id
  * @property array $data
  * @property string $context
+ * @property Collection|UserInterface[]|null $user All users which have this notification
+ * @property Collection|NotificationActivity[]|null $activities
  * @method static Builder forUser(UserInterface $user)
  * @method static Builder withActivities(array $activities)
  * @method static Builder withContext($context)
@@ -66,21 +69,21 @@ class Notification extends Eloquent
 		return $notification;
 	}
 
-
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function activities()
-    {
-        return $this->hasMany('Ipunkt\LaravelNotify\Models\NotificationActivity');
-    }
-
-    /**
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function user()
     {
         return $this->hasManyThrough('Illuminate\Auth\UserInterface', 'Ipunkt\LaravelNotify\Models\NotificationActivity', 'notification_id', 'user_id');
+    }
+
+    /**
+     * Get Default User-Scope
+     * @return UserInterface
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**
@@ -95,22 +98,12 @@ class Notification extends Eloquent
     }
 
     /**
-     * Get Default User-Scope
-     * @return UserInterface
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
      * @return bool
      */
     public function hasUser()
     {
         return (!is_null($this->user));
     }
-
 
     /**
      * @param Builder $query
@@ -130,6 +123,7 @@ class Notification extends Eloquent
             $q->where('user_id', '=', $user->getAuthIdentifier());
         });
     }
+
     /**
      * @param Builder $query
      * @param array $activities
@@ -140,28 +134,32 @@ class Notification extends Eloquent
 	    if (empty($activities)) {
 		    return $query;
 	    }
+        /**
+         * TODO could be optimized for proper handling with Eloquent methods
+         */
         return $query->whereHas('activities', function ($q) use ($activities) {
             /**  (SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = a.`notification_id` ORDER BY s.`id` DESC LIMIT 1) in ('created', 'read') */
             $q->whereIn(DB::raw('(SELECT s.activity FROM `notification_activities` s WHERE s.`notification_id` = `notification_activities`.`notification_id` ORDER BY s.`id` DESC LIMIT 1)'), $activities);
         });
     }
 
-	/**
-	 * Add Like / = Condition for Context. use * as wildcard
-	 *
-	 * @param Builder $query
-	 * @param $context
-	 * @return Builder|static
-	 */
-	public function scopeWithContext(Builder $query, $context) {
-		$operator = '=';
-		if (str_contains($context, '*')) {
-			$operator = 'LIKE';
-			$context = str_replace('*', '%', $context);
-		}
+    /**
+     * Add Like / = Condition for Context. use * as wildcard
+     *
+     * @param Builder $query
+     * @param $context
+     * @return Builder|static
+     */
+    public function scopeWithContext(Builder $query, $context)
+    {
+        $operator = '=';
+        if (str_contains($context, '*')) {
+            $operator = 'LIKE';
+            $context = str_replace('*', '%', $context);
+        }
 
-		return $query->where('context', $operator, $context);
-	}
+        return $query->where('context', $operator, $context);
+    }
 
 	/**
 	 * @param Builder $query
@@ -170,6 +168,19 @@ class Notification extends Eloquent
 	{
 		$query->orderBy('id', 'DESC');
 	}
+
+    /**
+     * @param UserInterface $user
+     * @return string|null
+     */
+    public function currentState(UserInterface $user = null)
+    {
+        $activity = $this->lastActivity($user);
+        if ($activity !== null) {
+            return $activity->activity;
+        }
+        return null;
+    }
 
     /**
      * @param UserInterface $user
@@ -188,34 +199,11 @@ class Notification extends Eloquent
     }
 
     /**
-     * @param UserInterface $user
-     * @return string|null
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function currentState(UserInterface $user = null)
+    public function activities()
     {
-        $activity = $this->lastActivity($user);
-        if ($activity !== null) {
-            return $activity->activity;
-        }
-        return null;
-    }
-
-    /**
-     * Return Data
-     * @return array
-     */
-    public function getDataAttribute()
-    {
-        return unserialize($this->attributes['data']);
-    }
-
-    /**
-     * Set Data-Array
-     * @param array $data
-     */
-    public function setDataAttribute(array $data)
-    {
-        $this->attributes['data'] = serialize($data);
+        return $this->hasMany('Ipunkt\LaravelNotify\Models\NotificationActivity');
     }
 
     /**
@@ -252,6 +240,24 @@ class Notification extends Eloquent
         $data = $this->getDataAttribute();
         $data[$key] = $value;
         $this->setDataAttribute($data);
+    }
+
+    /**
+     * Return Data
+     * @return array
+     */
+    public function getDataAttribute()
+    {
+        return unserialize($this->attributes['data']);
+    }
+
+    /**
+     * Set Data-Array
+     * @param array $data
+     */
+    public function setDataAttribute(array $data)
+    {
+        $this->attributes['data'] = serialize($data);
     }
 
 
