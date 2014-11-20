@@ -3,7 +3,7 @@ namespace Ipunkt\LaravelNotify\Models;
 
 use App;
 use Eloquent;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Created by PhpStorm.
@@ -40,7 +40,7 @@ class NotificationActivity extends Eloquent
     }
 
     /**
-     * @return HasOne
+     * @return BelongsTo
      */
     public function user()
     {
@@ -51,7 +51,7 @@ class NotificationActivity extends Eloquent
         $modelInstance = App::make('Illuminate\Auth\UserInterface');
         $modelClass = get_class($modelInstance);
 
-        return $this->hasOne($modelClass);
+        return $this->belongsTo($modelClass, 'user_id');
     }
 
 }

@@ -20,7 +20,7 @@ use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
  * @property integer $id
  * @property array $data
  * @property string $context
- * @property Collection|UserInterface[]|null $user All users which have this notification
+ * @property Collection|UserInterface[]|null $users All users which have this notification
  * @property Collection|NotificationActivity[]|null $activities
  * @method static Builder forUser(UserInterface $user)
  * @method static Builder withActivities(array $activities)
@@ -75,7 +75,7 @@ class Notification extends Eloquent
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function user()
+    public function users()
     {
         /**
          * get fresh instance of current binding of UserInterface
@@ -84,7 +84,7 @@ class Notification extends Eloquent
         $modelInstance = App::make('Illuminate\Auth\UserInterface');
         $modelClass = get_class($modelInstance);
 
-        return $this->hasManyThrough($modelClass, 'Ipunkt\LaravelNotify\Models\NotificationActivity', 'notification_id', 'user_id');
+        return $this->belongsToMany($modelClass, 'notification_activities', 'notification_id', 'user_id');
     }
 
     /**
