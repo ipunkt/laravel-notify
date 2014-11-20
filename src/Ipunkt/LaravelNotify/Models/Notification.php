@@ -34,7 +34,7 @@ class Notification extends Eloquent
 
     protected $fillable = ['data','context'];
 
-    protected $notdynamic = ['id', 'context', 'data', 'created_at', 'updated_at', 'deleted_at', 'user', 'activities'];
+    protected $notdynamic = ['id', 'context', 'data', 'created_at', 'updated_at', 'deleted_at', 'users', 'activities'];
 
     /** @var UserInterface $user set scope to default user */
     protected $user = null;
