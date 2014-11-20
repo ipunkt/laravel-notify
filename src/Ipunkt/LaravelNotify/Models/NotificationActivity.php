@@ -1,5 +1,7 @@
 <?php
 namespace Ipunkt\LaravelNotify\Models;
+
+use App;
 use Eloquent;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 

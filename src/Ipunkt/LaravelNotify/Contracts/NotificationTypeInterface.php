@@ -9,8 +9,8 @@
 namespace Ipunkt\LaravelNotify\Contracts;
 
 
-use Ipunkt\LaravelNotify\Models\Notification;
 use JsonSerializable;
+use Ipunkt\LaravelNotify\Models\Notification;
 use Symfony\Component\HttpFoundation\Response;
 
 interface NotificationTypeInterface extends JsonSerializable

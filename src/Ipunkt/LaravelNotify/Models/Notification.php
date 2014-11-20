@@ -1,11 +1,11 @@
 <?php
 namespace Ipunkt\LaravelNotify\Models;
 
+use App;
 use DB;
 use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
