@@ -1,6 +1,7 @@
 <?php
 namespace Ipunkt\LaravelNotify\Models;
 use Eloquent;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Created by PhpStorm.
@@ -36,9 +37,19 @@ class NotificationActivity extends Eloquent
         return $this->belongsTo('Ipunkt\LaravelNotify\Models\Notification');
     }
 
+    /**
+     * @return HasOne
+     */
     public function user()
     {
-        return $this->hasOne('Illuminate\Auth\UserInterface');
+        /**
+         * get fresh instance of current binding of UserInterface
+         * @var UserInterface $modelInstance
+         */
+        $modelInstance = App::make('Illuminate\Auth\UserInterface');
+        $modelClass = get_class($modelInstance);
+
+        return $this->hasOne($modelClass);
     }
 
 }

@@ -5,6 +5,7 @@ use DB;
 use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeContextInterface;
 use Ipunkt\LaravelNotify\Contracts\NotificationTypeInterface;
@@ -70,11 +71,20 @@ class Notification extends Eloquent
 	}
 
     /**
+     *
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function user()
     {
-        return $this->hasManyThrough('Illuminate\Auth\UserInterface', 'Ipunkt\LaravelNotify\Models\NotificationActivity', 'notification_id', 'user_id');
+        /**
+         * get fresh instance of current binding of UserInterface
+         * @var UserInterface $modelInstance
+         */
+        $modelInstance = App::make('Illuminate\Auth\UserInterface');
+        $modelClass = get_class($modelInstance);
+
+        return $this->hasManyThrough($modelClass, 'Ipunkt\LaravelNotify\Models\NotificationActivity', 'notification_id', 'user_id');
     }
 
     /**
