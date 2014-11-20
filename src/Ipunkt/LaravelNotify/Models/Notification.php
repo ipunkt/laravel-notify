@@ -73,7 +73,7 @@ class Notification extends Eloquent
     /**
      *
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
     public function users()
     {

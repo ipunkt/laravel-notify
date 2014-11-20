@@ -250,7 +250,7 @@ class NotificationManager
                  * remove action from all users
                  */
                 if ($class->isGrouped($unaction)) {
-                    $users = $notification->user;
+                    $users = $notification->users;
                 }
                 foreach ($users as $currentUser) {
                     $this->removeActivity($notification, $unaction, $currentUser);
@@ -267,7 +267,7 @@ class NotificationManager
                  * log grouped actions for all users
                  */
                 if ($class->isGrouped($action)) {
-                    $users = $notification->user;
+                    $users = $notification->users;
                 }
 
                 foreach ($users as $currentUser) {
