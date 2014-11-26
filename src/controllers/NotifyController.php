@@ -25,7 +25,7 @@ class NotifyController extends \Controller implements NotifyControllerInterface
      */
     public function __construct(UserInterface $user = null)
     {
-        $this->user = $user ? : Auth::user();
+	    $this->user = $user->getAuthIdentifier() !== null ? $user : Auth::user();
     }
 
     /**
